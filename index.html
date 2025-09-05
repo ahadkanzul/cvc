@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Full Matrix View</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #0044cc; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Data Matrix (num 0–15)</h1>
+  <table id="dataMatrix">
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be populated here via JavaScript -->
+    </tbody>
+  </table>
+
+  <script>
+    async function loadMatrix() {
+      const tbody = document.querySelector('#dataMatrix tbody');
+      for (let num = 0; num <= 15; num++) {
+        try {
+          const response = await fetch(\`https://famofcfallxd.serv00.net/apis/famdata.php?num=\${num}\`);
+          if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
+          const data = await response.json(); // adjust if non-JSON
+          const row = document.createElement('tr');
+          row.innerHTML = \`
+            <td>\${num}</td>
+            <td>\${JSON.stringify(data)}</td>
+          \`;
+          tbody.appendChild(row);
+        } catch (err) {
+          const row = document.createElement('tr');
+          row.innerHTML = \`
+            <td>\${num}</td>
+            <td style="color: red;">Error: \${err.message}</td>
+          \`;
+          tbody.appendChild(row);
+        }
+      }
+    }
+
+    loadMatrix();
+  </script>
+</body>
+</html>
