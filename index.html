@@ -2,28 +2,152 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Number Lookup</title>
+  <title>Ahad Sim Information</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-    input, button { padding: 10px; margin: 5px; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      font-family: Arial, sans-serif;
+      color: #00ff00;
+    }
+
+    h1 {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      color: #00ff00;
+      font-size: 28px;
+      text-shadow: 0 0 10px #00ff00;
+      z-index: 10;
+    }
+
+    .container {
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 10;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 15px #00ff00;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    input {
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+    }
+
+    button {
+      background: #0f0;
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: black;
+      color: #0f0;
+      border: 1px solid #0f0;
+    }
+
     .card {
-      background: white;
+      background: rgba(0, 0, 0, 0.85);
       border-radius: 10px;
       padding: 15px;
       margin: 10px 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0,255,0,0.5);
+      color: #0f0;
     }
-    .head { font-weight: bold; }
+
+    .head {
+      font-weight: bold;
+      color: #39ff14;
+    }
+
+    #matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
-  <h2>📱 Live Tracker Lookup</h2>
-  <input type="text" id="num" placeholder="Enter phone number">
-  <button onclick="searchNumber()">Search</button>
+  <h1>Ahad Sim Information</h1>
 
-  <div id="results"></div>
+  <!-- Matrix Background -->
+  <canvas id="matrix"></canvas>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h2>📱 Live Tracker Lookup</h2>
+    <input type="text" id="num" placeholder="Enter phone number">
+    <button onclick="searchNumber()">Search</button>
+    <div id="results"></div>
+  </div>
 
   <script>
+    // MATRIX BACKGROUND
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "00011010010101101010101010101010101011010";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let i = 0; i < columns; i++) {
+      drops[i] = 1;
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+
+    window.addEventListener("resize", () => {
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+    });
+
+    // LOOKUP FUNCTION
     async function searchNumber() {
       const num = document.getElementById("num").value.trim();
       const resultsDiv = document.getElementById("results");
@@ -36,7 +160,6 @@
       }
 
       try {
-        // call your PHP API
         const response = await fetch(`https://www.3patticenter.com/famofc/api/database.php?num=${encodeURIComponent(num)}`);
         const data = await response.json();
 
@@ -45,7 +168,6 @@
           return;
         }
 
-        // show results
         resultsDiv.innerHTML = "";
         data.data.forEach(record => {
           let card = `<div class="card">`;
